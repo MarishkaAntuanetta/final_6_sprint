@@ -13,25 +13,24 @@ import (
 
 // RootHandler — просто открывает index.html и отправляет браузеру
 func RootHandler(w http.ResponseWriter, r *http.Request) {
-	// Проверяем, что запрашивается именно главная страница
+	cwd, err := os.Getwd()
+	if err != nil {
+		fmt.Println("Не удалось получить рабочую директорию:", err)
+	} else {
+		fmt.Println("Рабочая директория:", cwd)
+	}
+
+	if _, err := os.Stat("index.html"); err != nil {
+		fmt.Println("index.html не найден или недоступен:", err)
+	} // Проверяем, что запрашивается именно главная страница
 	if r.URL.Path != "/" {
 		http.Error(w, "404 Страница не найдена", http.StatusNotFound)
 		return
 	}
-
-	// Открываем файл index.html
-	file, err := os.Open("../index.html")
-	if err != nil {
-		http.Error(w, "Главная страница недоступна", http.StatusInternalServerError)
-		return
-	}
-	defer file.Close()
-
 	// Устанавливаем заголовок Content-Type
 	w.Header().Set("Content-Type", "text/html")
-
-	// Копируем содержимое файла в ответ
-	io.Copy(w, file)
+	// Открываем файл index.html
+	http.ServeFile(w, r, "index.html")
 }
 
 // UploadHandler — принимает файл, конвертирует и сохраняет результат
