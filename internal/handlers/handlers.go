@@ -74,14 +74,14 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	// Создаём папку results, если её нет
 	err = os.MkdirAll("results", os.ModePerm)
 	if err != nil {
-		http.Error(w, "Не могу создать папку", http.StatusInternalServerError)
+		http.Error(w, "Не удалось создать папку", http.StatusInternalServerError)
 		return
 	}
 
 	// Создаём файл для записи результата
 	outputFile, err := os.Create(outputPath)
 	if err != nil {
-		http.Error(w, "Не могу создать файл", http.StatusInternalServerError)
+		http.Error(w, "Не удалось создать файл", http.StatusInternalServerError)
 		return
 	}
 	defer outputFile.Close()
@@ -94,5 +94,5 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Отправляем ответ пользователю
-	fmt.Fprintf(w, "Готово!\n\nРезультат:\n%s", result)
+	fmt.Fprintf(w, "Вы загрузили: %s\n\nРезультат:\n%s", string(data), result)
 }
