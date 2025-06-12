@@ -42,6 +42,5 @@ func New(logger *log.Logger) *Server {
 
 // Start запускает сервер
 func (s *Server) Start() error {
-	s.logger.Println("Мана есть! (Сервер запущен на порту :8080)")
 	return s.httpServer.ListenAndServe()
 }

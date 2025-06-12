@@ -13,20 +13,6 @@ import (
 
 // RootHandler — просто открывает index.html и отправляет браузеру
 func RootHandler(w http.ResponseWriter, r *http.Request) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		fmt.Println("Не удалось получить рабочую директорию:", err)
-	} else {
-		fmt.Println("Рабочая директория:", cwd)
-	}
-
-	if _, err := os.Stat("index.html"); err != nil {
-		fmt.Println("index.html не найден или недоступен:", err)
-	} // Проверяем, что запрашивается именно главная страница
-	if r.URL.Path != "/" {
-		http.Error(w, "404 Страница не найдена", http.StatusNotFound)
-		return
-	}
 	// Устанавливаем заголовок Content-Type
 	w.Header().Set("Content-Type", "text/html")
 	// Открываем файл index.html
@@ -36,8 +22,11 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 // UploadHandler — принимает файл, конвертирует и сохраняет результат
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	// Парсим форму (максимум 10 МБ)
-	r.ParseMultipartForm(10 << 20)
-
+	err := r.ParseMultipartForm(10 << 20) // 10MB
+	if err != nil {
+		http.Error(w, "Ошибка: не удалось распосзнать форму", http.StatusInternalServerError)
+		return
+	}
 	// Получаем файл по имени myFile
 	file, _, err := r.FormFile("myFile")
 	if err != nil {
@@ -55,7 +44,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Проверяем, что файл не пустой
 	if len(data) == 0 {
-		http.Error(w, "Ошибка: файл пустой", http.StatusBadRequest)
+		http.Error(w, "Ошибка: файл пустой", http.StatusInternalServerError)
 		return
 	}
 
@@ -93,5 +82,10 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Отправляем ответ пользователю
-	fmt.Fprintf(w, "Вы загрузили: %s\n\nРезультат:\n%s", string(data), result)
+	response := fmt.Sprintf("Вы загрузили: %s\n\nРезультат:\n%s", string(data), result)
+	_, err = w.Write([]byte(response))
+	if err != nil {
+		http.Error(w, "Ошибка отправки ответа", http.StatusInternalServerError)
+		return
+	}
 }

@@ -9,13 +9,13 @@ import (
 )
 
 // Convert — принимает строку и определяет, это код Морзе или обычный текст.
-// Если код Морзе → переводит в текст.
-// Если текст → переводит в код Морзе.
+// Если код Морзе переводит в текст.
+// Если текст переводит в код Морзе.
 func Convert(input string) (string, error) {
 	input = strings.TrimSpace(input)
 
 	if input == "" {
-		return "", errors.New("входная строка пустая")
+		return "", errors.New("the input string is empty")
 	}
 
 	if looksLikeMorse(input) {
@@ -29,10 +29,16 @@ func Convert(input string) (string, error) {
 
 // looksLikeMorse — проверяет, состоит ли строка только из точек, тире и пробелов
 func looksLikeMorse(s string) bool {
-	for _, ch := range s {
-		if ch != '.' && ch != '-' && !unicode.IsSpace(ch) {
-			return false
-		}
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return false
 	}
-	return true
+
+	// Ищем первый символ, который НЕ является ., - или пробелом
+	idx := strings.IndexFunc(s, func(r rune) bool {
+		return r != '.' && r != '-' && !unicode.IsSpace(r)
+	})
+
+	// Если такого символа нет — это код Морзе
+	return idx == -1
 }
