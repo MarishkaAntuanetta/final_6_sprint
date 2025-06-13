@@ -18,7 +18,7 @@ func Convert(input string) (string, error) {
 		return "", errors.New("the input string is empty")
 	}
 
-	if looksLikeMorse(input) {
+	if isMorse(input) {
 		// Переводим код Морзе в текст
 		return morse.ToText(input), nil
 	} else {
@@ -28,7 +28,7 @@ func Convert(input string) (string, error) {
 }
 
 // looksLikeMorse — проверяет, состоит ли строка только из точек, тире и пробелов
-func looksLikeMorse(s string) bool {
+func isMorse(s string) bool {
 	s = strings.TrimSpace(s)
 	if s == "" {
 		return false

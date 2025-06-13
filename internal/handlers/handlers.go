@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -13,8 +14,6 @@ import (
 
 // RootHandler — просто открывает index.html и отправляет браузеру
 func RootHandler(w http.ResponseWriter, r *http.Request) {
-	// Устанавливаем заголовок Content-Type
-	w.Header().Set("Content-Type", "text/html")
 	// Открываем файл index.html
 	http.ServeFile(w, r, "index.html")
 }
@@ -85,7 +84,6 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	response := fmt.Sprintf("Вы загрузили: %s\n\nРезультат:\n%s", string(data), result)
 	_, err = w.Write([]byte(response))
 	if err != nil {
-		http.Error(w, "Ошибка отправки ответа", http.StatusInternalServerError)
-		return
+		log.Printf("Ошибка при отправке ответа клиенту: %v", err)
 	}
 }
